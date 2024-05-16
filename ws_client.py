@@ -14,7 +14,7 @@ import websockets
 asyncio.get_event_loop().run_until_complete(echo_test())'''
 
 async def connect():
-    uri = "ws://localhost:3000/ws"
+    uri = "ws://16.170.247.233/ws"
     async with websockets.connect(uri) as websocket:
         print("Connected to server")
         while True:
