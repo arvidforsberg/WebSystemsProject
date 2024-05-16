@@ -1,15 +1,9 @@
-let current_status = false;
-fetch("./switch")
-.then((response) => response.json())
-.then((json) => current_status = json);
-
 async function updateStatus() {
 	const status_text = document.getElementById("status_text");
 
 	try {
 		const res = await fetch("./switch");
 		const cur_status = await res.json();
-		console.log(cur_status);
 		status_text.innerHTML = cur_status ? "On" : "Off";
 	} catch(err) {
 		console.log(err);
@@ -17,13 +11,7 @@ async function updateStatus() {
 }
 
 window.onload = () => {
-	const status_text = document.getElementById("status_text");
-
-	if (current_status == 0) {
-		status_text.innerHTML = "Off";
-	} else {
-		status_text.innerHTML = "On";
-	}
+	updateStatus();
 
 	const btn_on = document.getElementById("btn_on");
 	const btn_off = document.getElementById("btn_off");
@@ -49,8 +37,13 @@ window.onload = () => {
 				})
 			});
 
+			if (!res.ok) {
+				const errorMessage = await res.text();
+				alert(errorMessage);
+				return;
+			}
+
 			await updateStatus();	
-			console.log(res);
 		} catch (err) {
 			console.log(err);
 		}
@@ -69,8 +62,13 @@ window.onload = () => {
 				})
 			});
 
+			if (!res.ok) {
+				const errorMessage = await res.text();
+				alert(errorMessage);
+				return;
+			}
+			
 			await updateStatus();
-			console.log(res);
 		} catch (err) {
 			console.log(err);
 		}

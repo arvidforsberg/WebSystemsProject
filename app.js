@@ -48,18 +48,28 @@ app.get('/switch', async (request, response) => {
 app.post('/switch', async (request, response) => {
 	try {
 		const { id, state } = request.body;
-		const switchId = await changeSwitchState(id, state);
 
-		// Alert WebSocket connection	
+		// Alert WebSocket connection (alerts all connections)
+		// Behaviour might be extended if we add handling of multiple switches
+		
 		clients.forEach((client) => {
 			if (client.readyState === client.OPEN) {
 				client.send(state);
 			}
 		});
 
-		response.send(switchId.toString());
+		if (clients.size == 0) {
+			throw new Error('Switch not connected');
+		}
+
+		const switchId = await changeSwitchState(id, state);
+		response.send(switchId.toString())
 	} catch (err) {
-		response.status(500).send('error');
+		if (err.message == 'Switch not connected') {
+			response.status(503).send('Switch not connected');
+		} else {
+			response.status(500).send('error');
+		}
 	}
 });
 
