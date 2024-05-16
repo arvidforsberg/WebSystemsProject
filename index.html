@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TESTINETISNT</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="assets/style.css">
+        <script src="assets/script.js"></script>
+    </head>
+    
+    <body>
+	    <div class="content">
+
+		<div class="status">
+		    <h1 id="status_text">CURRENT_STATUS</h1>
+		</div>
+
+		<div class="buttons">
+		    <button id="btn_on">ON</button>
+		    <button id="btn_off">OFF</button>
+		</div>
+
+		<div class="login_options">
+			<p id="create_account_p">Create Account</p>
+			<p id="login_p">Log in</p>
+		</div>
+		
+		<form id="create_account" style="display: none;">
+			<label for="username_create">Username</label>
+			<input type="text" id="username_create" name="username_create"/>
+			<label for="password_create">Password</label>
+			<input type="password" id="password_create" name="password_create"/>
+			<input type="submit" value="Create Account">
+		</form>
+		
+		<form id="login" style="display: none";>
+			<label for="username_login">Username</label>
+			<input type="text" id="username_login" name="username_login"/>
+			<label for="password_login">Password</label>
+			<input type="password" id="password_login" name="password_login"/>
+			<input type="submit" value="Login">
+		</form>
+
+		<p id="return">Return</p>
+	    </div>
+    </body>
+</html>
