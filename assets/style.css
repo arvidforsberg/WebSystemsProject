@@ -14,7 +14,7 @@ body {
     align-items: center;
 }
 
-.buttons {
+.buttons, .mic_container {
     display: flex;
     justify-content: center;
 }

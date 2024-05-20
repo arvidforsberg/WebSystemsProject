@@ -19,6 +19,21 @@ app.use(session({
 	cookie: { secure: false }
 }));
 
+async function toggleSwitch(id, state) {
+	clients.forEach((client) => {
+		if (client.readyState === client.OPEN) {
+			client.send(state);
+		}
+	});
+
+	if (clients.size == 0) {
+		throw new Error('Switch not connected');
+	}
+
+	const switchId = await changeSwitchState(id, state);
+	return switchId;
+}
+
 app.get('/', async (request, response) => {
 	try {	
 		response.send( await readFile('./index.html', 'utf8') );
@@ -111,6 +126,29 @@ app.get('/admin', async (request, response) => {
 		}
 	}  catch (err) {
 		response.status(500).send('error');
+	}
+});
+
+app.post('/voice_command', async (request, response) => {
+	try {
+		const { id, command } = request.body;	
+		console.log('Received voice command: ', command);
+
+		if (command == 'turn on') {
+			const state = 1;
+			const switchId = await toggleSwitch(id, state);
+		} else if (command == 'turn off') {
+			const state = 0;
+			const switchId = await toggleSwitch(id, state);
+		}
+		
+		response.send(id.toString());
+	} catch (err) {
+		if (err.message == 'Switch not connected') {
+			response.status(503).send('Switch not connected');
+		} else {
+			response.status(500).send('error');
+		}
 	}
 });
 

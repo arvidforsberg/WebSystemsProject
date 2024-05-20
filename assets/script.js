@@ -13,6 +13,9 @@ async function updateStatus() {
 window.onload = () => {
 	updateStatus();
 
+	var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+	var recognition = new SpeechRecognition();
+
 	const btn_on = document.getElementById("btn_on");
 	const btn_off = document.getElementById("btn_off");
 
@@ -23,6 +26,8 @@ window.onload = () => {
 	const loginUserForm = document.getElementById("login");
 
 	const returnText = document.getElementById("return");
+
+	const micButton = document.getElementById("activate_mic");
 
 	btn_on.addEventListener('click', async () => {
 		try {
@@ -190,4 +195,36 @@ window.onload = () => {
 		loginUserText.style.display = 'inline';
 		returnText.style.display = 'none';
 	});
+
+	micButton.addEventListener('click', () => {
+		recognition.start();
+	});
+
+	recognition.onresult = async (event) => {
+		const last = event.results.length - 1;
+		const command = event.results[last][0].transcript;
+		
+		console.log('Voice command: ', command);
+
+		try {
+			const res = await fetch('/voice_command', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					command: command.trim().toLowerCase(),
+					id: 1
+				})
+			});
+
+			if (!res.ok) {
+				const errorMessage = await res.text();
+				alert(errorMessage);
+				return;
+			}
+			
+			await updateStatus();
+		} catch (err) {
+			console.log(err);
+		}
+	};
 }
