@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Lightswitch</title>
+<title>Login</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<script src="assets/script.js"></script>
+<script src="assets/script_login.js"></script>
 <style>
 body, h1, h2, h3, h4, h5, h6 {font-family: "Montserrat", sans-serif}
 .w3-row-padding img {margin-bottom: 12px}
@@ -17,39 +17,8 @@ body, h1, h2, h3, h4, h5, h6 {font-family: "Montserrat", sans-serif}
 #main {margin-left: 120px}
 /* Remove margins from "page content" on small screens */
 @media only screen and (max-width: 600px) {#main {margin-left: 0}}
-@media only screen and (max-width: 600px){.light-dark-button {bottom: 10px !important; top: 90% !important;}
-} 
 
-.hollow-circle {
-  width: 200px;
-  height: 200px;
-  border: 15px solid red;
-  border-radius: 50%;
-  background-color: transparent;
-  margin: 0 auto;
-  display: block;
-  margin-top: 5%;
-  transition: border-color 0.5s, box-shadow 0.5s;
-  box-shadow: 0 0 20px red;
-}
 
-/* Style for the toggle button */
-.toggle-button {
-  display: block;
-  margin: 20px auto;
-  padding: 10px 20px;
-  background-color: #555;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.toggle-button:hover {
-  background-color: #333;
-}
-
-/* Style for the light/dark mode button */
 .light-dark-button {
   position: absolute;
   top: 10px;
@@ -66,22 +35,6 @@ body, h1, h2, h3, h4, h5, h6 {font-family: "Montserrat", sans-serif}
   background-color: #333;
 }
 
-/* Style for the voice control button */
-.voice-control-button {
-  display: block;
-  margin: 20px auto;
-  padding: 10px 20px;
-  background-color: #555;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.voice-control-button:hover {
-  background-color: #333;
-}
-
 body.light-mode .w3-sidebar {
   background-color: #f1f1f1 !important;
 }
@@ -90,16 +43,74 @@ body.dark-mode .w3-sidebar {
   background-color: #222 !important;
 }
 
-.voice-control-indicator {
+.login-container {
   display: none;
-  font-size: 50px;
-  color: green;
-  margin-left: 10px;
+  justify-content: space-between;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #333;
+  border-radius: 10px;
 }
 
-body.voice-control-enabled .voice-control-indicator {
+.login-container input[type="text"], .login-container input[type="password"] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
   display: inline-block;
+  border: none;
+  background: #f1f1f1;
 }
+
+.login-container input[type="text"]:focus, .login-container input[type="password"]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.login-container button {
+  background-color: #555;
+  color: white;
+  padding: 15px 20px;
+  border: none;
+  cursor: pointer;
+  width: 48%;
+  opacity: 0.9;
+}
+
+.login-container button:hover {
+  background-color: #333;
+}
+
+.logout-container {
+	display: none;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.logout-container button {
+  display: block;
+  background-color: #555;
+  color: white;
+  padding: 15px 20px;
+  border: none;
+  cursor: pointer;
+  width: 48%;
+  opacity: 0.9;
+}
+
+.logout-container button:hover {
+  background-color: #333;
+} 
+
+@media only screen and (max-width: 600px){.light-dark-button {bottom: 10px !important; top: 90% !important;}
 
 </style>
 </head>
@@ -108,11 +119,11 @@ body.voice-control-enabled .voice-control-indicator {
 <!-- Icon Bar (Sidebar - hidden on small screens) -->
 <nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
   <!-- Avatar image in top left corner -->
-  <a href="/" class="w3-bar-item w3-button w3-padding-large w3-black">
+  <a href="/" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
     <i class="fa fa-home w3-xxlarge"></i>
     <p>HOME</p>
   </a>
-  <a href="/login" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+  <a href="/login" class="w3-bar-item w3-button w3-padding-large w3-black">
     <i class="fa fa-user w3-xxlarge"></i>
     <p>LOGIN</p>
   </a>
@@ -138,22 +149,33 @@ body.voice-control-enabled .voice-control-indicator {
 
 <!-- Page Content -->
 <div class="w3-padding-large" id="main">
-  <!-- Header/Home -->
-  <header class="w3-container w3-padding-32 w3-center w3-black" id="home">
-    <h1 class="w3-jumbo"><span class="w3-hide-small">Remote</span> Lightswitch</h1>  
+  <!-- Header/Login -->
+  <header class="w3-container w3-padding-32 w3-center w3-black" id="login">
+    <h1 class="w3-jumbo"><span class="w3-hide-small">User</span> Login</h1>
   </header>
-  
+
   <!-- Light/Dark Mode Button -->
   <button class="light-dark-button" onclick="toggleLightDarkMode()">Light/Dark Mode</button>
-  
-  <!-- Hollow Red Circle and Toggle Button -->
-  <div class="w3-center">
-    <div class="hollow-circle" id="lightCircle"></div>
-    <button id="toggle-button" class="toggle-button">Toggle On/Off</button>
-    <button id="mic-button" class="voice-control-button"><i class="fa fa-microphone"></i> Toggle Voice Control</button>
-	<i class="fa fa-microphone voice-control-indicator" id="voiceControlIndicator"></i>
+
+  <!-- Login Form -->
+  <div id="login-container" class="login-container w3-center">
+    <form id="account-form">
+      <label for="uname"><b>Username</b></label>
+      <input type="text" placeholder="Enter Username" name="uname" required>
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required>
+      <div class="button-container">
+        <button type="submit" value="Login">Login</button>
+        <button type="submit" value="Create Account">Create Account</button>
+      </div>
+    </form>
+  </div>
+  <div id="logout-container" class="logout-container w3-center">
+    <p id="user-info"></p>
+    <button id="logout-button">Log out</button>
   </div>
 </div>
+
 
 <!-- END PAGE CONTENT -->
 </div>

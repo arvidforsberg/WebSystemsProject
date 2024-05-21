@@ -2,6 +2,7 @@ import asyncio
 import websockets
 
 async def connect():
+    #uri = "wss://switchbitch.online/ws"
     uri = "ws://localhost:3000/ws"
     async with websockets.connect(uri) as websocket:
         print("Connected to server")

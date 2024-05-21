@@ -62,6 +62,10 @@ app.get('/switch', async (request, response) => {
 
 app.post('/switch', async (request, response) => {
 	try {
+		if (!request.session.role) {
+			throw new Error('Not logged in');
+		}
+
 		const { id, state } = request.body;
 
 		// Alert WebSocket connection (alerts all connections)
@@ -82,6 +86,8 @@ app.post('/switch', async (request, response) => {
 	} catch (err) {
 		if (err.message == 'Switch not connected') {
 			response.status(503).send('Switch not connected');
+		} else if (err.message == 'Not logged in') {
+			response.status(503).send('Please log in for this functionality');
 		} else {
 			response.status(500).send('error');
 		}
@@ -102,21 +108,6 @@ app.post('/create_user', async (request, response) => {
 	}
 });
 
-app.post('/login', async (request, response) => {
-	try {
-		const { username, password } = request.body;
-		const user = await validateUser(username, password);
-		request.session.role = user.role;
-		response.json( { role: user.role });
-	} catch (err) {
-		if (err.message === 'Invalid username or password') {
-			response.status(400).send('Invalid username or password');
-		} else {
-			response.status(500).send('error');
-		}
-	}
-});
-
 app.get('/admin', async (request, response) => {
 	try {	
 		if (request.session.role === 'admin') {
@@ -131,6 +122,10 @@ app.get('/admin', async (request, response) => {
 
 app.post('/voice_command', async (request, response) => {
 	try {
+		if (!request.session.role) {
+			throw new Error('Not logged in');
+		}
+
 		const { id, command } = request.body;	
 		console.log('Received voice command: ', command);
 
@@ -141,14 +136,81 @@ app.post('/voice_command', async (request, response) => {
 			const state = 0;
 			const switchId = await toggleSwitch(id, state);
 		}
-		
 		response.send(id.toString());
 	} catch (err) {
 		if (err.message == 'Switch not connected') {
 			response.status(503).send('Switch not connected');
+		} else if (err.message == 'Not logged in') {
+			response.status(503).send('Please log in for this functionality');
 		} else {
 			response.status(500).send('error');
 		}
+	}
+});
+
+app.get('/login', async (req, res) => {
+	try {
+		res.send( await readFile('./login.html', 'utf8') );
+	} catch (err) {
+		res.status(500).send('Error with login file');
+	}
+});
+
+app.post('/login', async (request, response) => {
+	try {
+		const { username, password } = request.body;
+		const user = await validateUser(username, password);
+		request.session.username = user.username;
+		request.session.role = user.role;
+		response.json( { role: user.role });
+	} catch (err) {
+		if (err.message === 'Invalid username or password') {
+			response.status(400).send('Invalid username or password');
+		} else {
+			response.status(500).send('error');
+		}
+	}
+});
+
+app.post('/logout', async (request, response) => {
+	try {
+		request.session.destroy(err => {
+			if (err) {
+				return response.status(500).send('Failed to log out');
+			}
+			response.clearCookie('connect.sid');
+			response.send('Logged out');
+		});
+	} catch (err) {
+		response.status(500).send('error');
+	}
+});
+
+app.get('/session_info', async (request, response) => {
+	try {
+		if (request.session) {
+			response.json(request.session);
+		} else {
+			response.status(404).send('No session found');
+		}
+	} catch (err) {
+		response.status(500).send('error');
+	}
+});
+
+app.get('/timer', async (request, response) => {
+	try {
+		response.send( await readFile('./timer.html', 'utf8') );
+	} catch (err) {
+		response.status(500).send('error');
+	}
+});
+
+app.get('/settings', async (request, response) => {
+	try {
+		response.send( await readFile('./settings.html', 'utf8') );
+	} catch (err) {
+		response.status(500).send('error');
 	}
 });
 
