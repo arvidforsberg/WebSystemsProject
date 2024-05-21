@@ -129,10 +129,10 @@ app.post('/voice_command', async (request, response) => {
 		const { id, command } = request.body;	
 		console.log('Received voice command: ', command);
 
-		if (command == 'turn on') {
+		if (command.includes('turn on') || command.includes('Turn on')) {
 			const state = 1;
 			const switchId = await toggleSwitch(id, state);
-		} else if (command == 'turn off') {
+		} else if (command.includes('turn off') || command.includes('Turn off')) {
 			const state = 0;
 			const switchId = await toggleSwitch(id, state);
 		}
