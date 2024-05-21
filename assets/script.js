@@ -1,3 +1,16 @@
+const socket = new WebSocket('ws://localhost:3000/ws/browser');
+
+socket.onopen = (event) => {
+	console.log('WebSocket is connected.');
+};
+
+socket.onmessage = (event) => {
+	const data = JSON.parse(event.data);
+	if (data.type == 'updateSwitchState') {
+		updateStatus();
+	}
+};
+
 window.onload = () => {
 	updateStatus();
 

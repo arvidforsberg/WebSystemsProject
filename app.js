@@ -31,6 +31,15 @@ async function toggleSwitch(id, state) {
 	}
 
 	const switchId = await changeSwitchState(id, state);
+
+	browsers.forEach((browser) => {
+		if (browser.readyState === browser.OPEN) {
+			browser.send(JSON.stringify({
+				type: 'updateSwitchState'
+			}));
+		}
+	});
+
 	return switchId;
 }
 
@@ -70,18 +79,8 @@ app.post('/switch', async (request, response) => {
 
 		// Alert WebSocket connection (alerts all connections)
 		// Behaviour might be extended if we add handling of multiple switches
-		
-		clients.forEach((client) => {
-			if (client.readyState === client.OPEN) {
-				client.send(state);
-			}
-		});
 
-		if (clients.size == 0) {
-			throw new Error('Switch not connected');
-		}
-
-		const switchId = await changeSwitchState(id, state);
+		const switchId = await toggleSwitch(id, state);
 		response.send(switchId.toString())
 	} catch (err) {
 		if (err.message == 'Switch not connected') {
@@ -225,12 +224,24 @@ app.get('/settings', async (request, response) => {
 
 const clients = new Set(); // Stored in a set in case we wanted to expand functionality to handle multiple switches
 
-app.ws('/ws', (ws, request) => {
-	console.log("New WebSocket connection"); 
+app.ws('/ws/pi', (ws, request) => {
+	console.log("New Raspberry Pi WebSocket connection"); 
 	clients.add(ws);
 
 	ws.on('close', () => {
-		console.log("WebSocket connection closed");
+		console.log("Raspberry Pi WebSocket connection closed");
+		clients.delete(ws);
+	});
+});
+
+const browsers = new Set();
+
+app.ws('/ws/browser', (ws, request) => {
+	console.log("New Browser WebSocket connection"); 
+	browsers.add(ws);
+
+	ws.on('close', () => {
+		console.log("Browser WebSocket connection closed");
 		clients.delete(ws);
 	});
 });
