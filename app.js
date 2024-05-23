@@ -213,6 +213,93 @@ app.get('/settings', async (request, response) => {
 	}
 });
 
+let timers = [];
+
+app.post('/timer', async (request, response) => {
+	try {
+		if (!request.session.role) {
+			throw new Error('Not logged in');
+		}
+
+		const { time, action } = request.body;
+		const now = new Date();
+		const [hours, minutes] = time.split(':').map(Number);
+		const targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+
+		if (targetTime < now) {
+			throw new Error('Time already elapsed');
+		}
+
+		const delay = targetTime - now;
+
+		timers.forEach((timer) => {
+			if (timer.time === time) {
+				throw new Error('Time taken');
+			}
+		});
+
+		const timerId = setTimeout(async () => {
+			try {
+				let state = -1;
+				if (action === 'on') {
+					state = 1;
+				} else if (action === 'off') {
+					state = 0;
+				} else {
+					const cur_status = await getSwitchState();
+					state = cur_status === 0 ? 1 : 0;
+				}
+
+				await toggleSwitch(1, state);
+			} catch (err) {
+				if (err.message === 'Switch not connected') {
+					console.error("Switch was not connected when timer went off");
+				}
+
+				console.error(err);
+			} finally {
+				const idx = timers.findIndex(t => t.timerId === timerId);
+				if (idx !== -1) timers.splice(idx, 1);
+			}
+		}, delay);
+
+		timers.push({ timerId, time, action });
+
+		response.send(`Timer set for ${time} with action '${action}'`);
+	} catch (err) {
+		if (err.message === 'Not logged in') {
+			response.status(503).send('Please log in for this functionality');
+		} else if (err.message === 'Time already elapsed') {
+			response.status(503).send('Time already elapsed, try again');
+		} else if (err.message === 'Time taken') {
+			response.status(503).send('Timer with same timestamp already exists');
+		} else {
+			response.status(500).send('error');
+		}
+	}
+});
+
+app.get('/active_timers', async (request, response) => {
+	try {
+		const clientTimers = timers.map(({ time, action }) => ({ time, action }));
+		response.json(clientTimers);
+	} catch (err) {
+		console.log(err);
+		response.status(500).send('err');
+	}
+});
+
+app.post('/clear_timers', async (request, response) => {
+	try {
+		timers.forEach(timer => clearTimeout(timer.timerId));
+		timers = [];
+		response.send('Timers cleared');
+	} catch (err) {
+		console.log(err);
+		response.status(500).send('err');
+	}
+});
+
 // WebSocket endpoints
 
 // echo endpoint for testing

@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="assets/script_timer.js"></script>
 <style>
 body, h1, h2, h3, h4, h5, h6 {font-family: "Montserrat", sans-serif}
 .w3-row-padding img {margin-bottom: 12px}
@@ -41,6 +42,46 @@ body.light-mode .w3-sidebar {
 body.dark-mode .w3-sidebar {
   background-color: #222 !important;
 }
+
+.timer-container {
+	display: flex;
+	justify-content: center;
+	margin: 0 auto;
+	max-width: 500px;
+	padding: 20px;
+	background-color: #333;
+	border-radius: 10px;
+}
+
+#timer-form {
+	display: flex;
+	flex-direction: column;
+	align-items: space-between;
+	width: 80%
+}
+
+#timer-form * {
+	margin: 10px;
+}
+
+#timer-form label {
+	text-align: center;
+	font-weight: bold;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #333;
+}
+
 
 @media only screen and (max-width: 600px){.light-dark-button {bottom: 10px !important; top: 90% !important;}
 
@@ -88,6 +129,23 @@ body.dark-mode .w3-sidebar {
 
   <!-- Light/Dark Mode Button -->
   <button class="light-dark-button" onclick="toggleLightDarkMode()">Light/Dark Mode</button>
+
+<!-- Timer form -->
+<div class="timer-container">
+	<form id="timer-form">
+		<label for="time">Time</label>
+		<input name="time" type="time" id="time" required>
+		<label for="action">Action</label>
+		<select name="action" id="action">
+			<option value="on">Turn on</option>
+			<option value="off">Turn off</option>
+			<option value="toggle">Toggle</option>
+		</select>
+		<button type="submit">Set timer</button>
+		<button type="button" id="active-timers-btn">Show active timers</button>
+		<button type="button" id="clear-timers-btn">Clear active timers</button>
+	</form>
+</div>
 
 <!-- END PAGE CONTENT -->
 </div>
