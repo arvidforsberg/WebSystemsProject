@@ -7,8 +7,17 @@ window.onload = () => {
 		const formData = new FormData(timerForm);
 		const time = formData.get('time');
 		const action = formData.get('action');
+
+		const now = new Date();
+		const [hours, minutes] = time.split(':').map(Number);
+		now.setHours(hours, minutes, 0, 0);
+
+		const utcHours = now.getUTCHours();
+		const utcMinutes = now.getUTCMinutes();
+		const utcTime = `${utcHours.toString().padStart(2, '0')}:${utcMinutes.toString().padStart(2, '0')}`;
+
 		const data = {
-			'time': time,
+			'time': utcTime,
 			'action': action
 		};
 
@@ -27,7 +36,7 @@ window.onload = () => {
 		}
 
 		const timerText = await res.text();
-		alert(timerText);
+		alert(`Timer set for ${time} with action ${action}`);
 	});
 
 	const activeTimersBtn = document.getElementById('active-timers-btn');
@@ -43,7 +52,19 @@ window.onload = () => {
 		}
 
 		timers.forEach(timer => {
-			console.log(`Time: ${timer.time}	Action: ${timer.action}`);
+			const utcTime = timer.time;
+			const [hours, minutes] = utcTime.split(':').map(Number);
+
+			const now = new Date();
+			const dateUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hours, minutes));
+			const localDate = new Date(dateUTC.toLocaleString());
+			const displayTime = localDate.toLocaleTimeString('en-US', {
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: false
+			});
+
+			console.log(`Time: ${displayTime}	Action: ${timer.action}`);
 		});
 	});
 

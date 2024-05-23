@@ -224,7 +224,11 @@ app.post('/timer', async (request, response) => {
 		const { time, action } = request.body;
 		const now = new Date();
 		const [hours, minutes] = time.split(':').map(Number);
-		const targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+		const targetTime = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes));
+
+		console.log(hours, minutes);
+		console.log(now);
+		console.log(targetTime);
 
 		if (targetTime < now) {
 			throw new Error('Time already elapsed');
