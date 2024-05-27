@@ -3,7 +3,7 @@ import session from 'express-session';
 import expressWs from 'express-ws';
 
 import { readFile } from 'fs/promises';
-import { getUsers, getSwitchState, changeSwitchState, createUser, validateUser } from './db.js';
+import { getUsers, getSwitchState, changeSwitchState, createUser, deleteUser, validateUser } from './db.js';
 
 const app = express();
 const port = 3000;
@@ -207,7 +207,14 @@ app.get('/timer', async (request, response) => {
 
 app.get('/settings', async (request, response) => {
 	try {
-		response.send( await readFile('./settings.html', 'utf8') );
+		// Not logged in
+		if (!request.session.role) {
+			response.send( await readFile('./settings.html', 'utf8') );			
+		} else if (request.session.role === 'normal') {
+			response.send( await readFile('./settings_normal.html', 'utf8') );
+		} else {
+			response.send( await readFile('./settings_admin.html', 'utf8') );
+		}
 	} catch (err) {
 		response.status(500).send('error');
 	}
@@ -304,14 +311,34 @@ app.post('/clear_timers', async (request, response) => {
 	}
 });
 
-// WebSocket endpoints
+app.post('/delete_user', async (request, response) => {
+	try {
+		const { username } = request.body;	
 
-// echo endpoint for testing
-//app.ws('/echo', (ws, request) => {
-//	ws.on('message', (msg) => {
-//		ws.send(message);
-//	});
-//});
+		if (username === request.session.username) {
+			throw new Error('Cannot delete your own account');
+		}
+
+		if (!request.session.role || request.session.role !== 'admin') {
+			throw new Error('Only admins can perform this action');
+		}
+
+		await deleteUser(username); 
+		response.send(`User '${username}' deleted`);
+	} catch (err) {
+		if (err.message === 'Username does not exist') {
+			response.status(503).send('Username does not exist');
+		} else if (err.message === 'Cannot delete your own account') {
+			response.status(503).send('Cannot delete your own account');
+		} else if (err.message === 'Only admins can perform this action') {
+			response.status(503).send('Only admins can perform this action');
+		} else {
+			response.status(500).send('err');
+		}
+	}
+});
+
+// WebSocket endpoints
 
 const clients = new Set(); // Stored in a set in case we wanted to expand functionality to handle multiple switches
 

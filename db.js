@@ -32,6 +32,28 @@ export async function createUser(username, password) {
 	}
 }
 
+export async function deleteUser(username) {
+	try {
+		const [nameCheck] = await pool.query(`
+		SELECT count(*) FROM Users
+		WHERE username = ?
+		`, [username]);
+
+		if (nameCheck[0]['count(*)'] === 0) {
+			throw new Error('Username does not exist');
+		}
+		
+		const [result] = await pool.query(`
+		DELETE FROM Users
+		WHERE username = ?
+		`, [username]);
+
+		return result.affectedRows;
+	} catch (err) {
+		throw err;	
+	}
+}
+
 export async function getSwitchState() {
 	const [rows] = await pool.query("SELECT switch_state FROM Switches;");
 	return rows[0].switch_state;
@@ -66,4 +88,7 @@ export async function validateUser(username, password) {
 //console.log(test);
 
 //const test = await validateUser('test', 'test');
+//console.log(test);
+
+//const test = await deleteUser('test');
 //console.log(test);

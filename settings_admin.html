@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="assets/script_settings.js"></script>
 <style>
 body, h1, h2, h3, h4, h5, h6 {font-family: "Montserrat", sans-serif}
 .w3-row-padding img {margin-bottom: 12px}
@@ -49,6 +50,17 @@ body.dark-mode .w3-sidebar {
   padding: 20px;
   background-color: #333;
   border-radius: 10px;
+}
+
+.settings-container form {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin: 20px;
+}
+
+.settings-container label, input {
+	margin-bottom: 10px;
 }
 
 @media only screen and (max-width: 600px){.light-dark-button {bottom: 10px !important; top: 90% !important;}
@@ -100,7 +112,11 @@ body.dark-mode .w3-sidebar {
 
 <!-- Settings Content -->
 <div class="settings-container">
-	<p>No settings added yet!</p>
+	<form id="delete-user-form">
+		<label for="username"><b>Delete User</b></label>
+		<input type="text" placeholder="Enter username" name="username" required>
+		<button type="submit">Delete</button>
+	</form>
 </div>
 
 <!-- END PAGE CONTENT -->
